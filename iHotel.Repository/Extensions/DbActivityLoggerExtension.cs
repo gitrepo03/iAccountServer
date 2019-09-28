@@ -41,7 +41,7 @@ namespace iHotel.Repository.Extensions
             //Get List of Entityes that doesnot contains value from AuditId(AudId) Property.
             addedEntities.Where(ae =>
                    !EntityAllowedWithoutAudId.Contains(ae.Entity.GetType().Name)
-                && string.IsNullOrEmpty(ae.Property("AudId")?.CurrentValue?.ToString()) == true
+                && ae.Entity is EntityBase
             ).ToList().ForEach(ae => {
                 ae.Property("AudId").CurrentValue = Utility.GenerateUnikeAuditId();
                 var orgProp = ae.Metadata.FindProperty("Organization");
@@ -56,7 +56,7 @@ namespace iHotel.Repository.Extensions
 
             var addedEntityWithout_AudId = addedEntities.Where(ae =>
                    !EntityAllowedWithoutAudId.Contains(ae.Entity.GetType().Name)
-                && string.IsNullOrEmpty(ae.Property("AudId")?.CurrentValue?.ToString()) == true
+                && ae.Entity is EntityBase
             ).ToList();
 
             //Check if Entity to add contains AuditId(AudId) or not.
