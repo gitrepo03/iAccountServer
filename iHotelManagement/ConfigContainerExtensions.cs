@@ -94,6 +94,12 @@ namespace iHotelManagement
         public static void AddSingletonServices(this IServiceCollection services)
         {
             services.AddSingleton<AppHub<Organization>>();
+            services.AddSingleton<AppHub<FiscalYear>>();
+            services.AddSingleton<AppHub<VoucherType>>();
+            services.AddSingleton<AppHub<AccountRef>>();
+            services.AddSingleton<AppHub<LedgerRef>>();
+            services.AddSingleton<AppHub<VoucherMaster>>();
+            services.AddSingleton<AppHub<VoucherDetail>>();
 
         }
 

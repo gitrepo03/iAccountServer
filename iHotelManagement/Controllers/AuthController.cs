@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using iHotel.Entity.Identity;
 using iHotel.Repository.Helper;
@@ -23,48 +24,23 @@ namespace iHotelManagement.Controllers
             this.authService = authService;
         }
 
+        // Post: api/SuperAdminDeveloperRegister
+        [HttpPost]
+        [Route("SADRegister")]
+        [Authorize(Roles = "SuperAdminDeveloper")]
+        public async Task<IActionResult> SADRegister([FromBody] UserModel model)
+        {
+            return await registerAction(model);
+        }
+
         // Post: api/Register
         [HttpPost]
         [Route("Register")]
+        [Authorize]
         public async Task<IActionResult> Register([FromBody] UserModel model)
         {
-            RegisterResponseModel resp = new RegisterResponseModel();
-            try
-            {
-                resp = await authService.RegisterAsync(model);
-            }catch(Exception ex)
-            {
-                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
-            }
-
-            if (!resp.NewUserResult.Succeeded)
-            {
-                string errorMessage = "";
-                foreach(var error in resp.NewUserResult.Errors)
-                {
-                    errorMessage += error.Description + "\n";
-                }
-                return BadRequest("Error occured while registering new user." + errorMessage);
-            }
-            if (!resp.RoleAddResult.Succeeded)
-            {
-                string errorMessage = "";
-                foreach (var error in resp.NewUserResult.Errors)
-                {
-                    errorMessage += error.Description + "\n";
-                }
-                return BadRequest("Error occured while assigning role to new user." + errorMessage);
-            }
-            if (!resp.SentAccVerfCodeSucceed)
-            {
-                return BadRequest("Error while sending email verification code.");
-            }
-
-            return Ok(new {
-                success = true,
-                errors = 0,
-                successMessage = "New user created successfully"
-            });
+            model.Organization = int.Parse(authService.GetLoggedInUserClames().Organization);
+            return await registerAction(model);
         }
 
         // Post: api/Login
@@ -85,6 +61,7 @@ namespace iHotelManagement.Controllers
         // POST: api/Auth
         [HttpPost]
         [Route("Role")]
+        [Authorize(Roles = "SuperAdminDeveloper")]
         public async Task<IActionResult> Post([FromBody] string role)
         {
             try
@@ -147,6 +124,49 @@ namespace iHotelManagement.Controllers
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }
+        }
+
+        private async Task<IActionResult> registerAction(UserModel model)
+        {
+            RegisterResponseModel resp = new RegisterResponseModel();
+            try
+            {
+                resp = await authService.RegisterAsync(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+            }
+
+            if (!resp.NewUserResult.Succeeded)
+            {
+                string errorMessage = "";
+                foreach (var error in resp.NewUserResult.Errors)
+                {
+                    errorMessage += error.Description + "\n";
+                }
+                return BadRequest("Error occured while registering new user." + errorMessage);
+            }
+            if (!resp.RoleAddResult.Succeeded)
+            {
+                string errorMessage = "";
+                foreach (var error in resp.NewUserResult.Errors)
+                {
+                    errorMessage += error.Description + "\n";
+                }
+                return BadRequest("Error occured while assigning role to new user." + errorMessage);
+            }
+            if (!resp.SentAccVerfCodeSucceed)
+            {
+                return BadRequest("Error while sending email verification code.");
+            }
+
+            return Ok(new
+            {
+                success = true,
+                errors = 0,
+                successMessage = "New user created successfully"
+            });
         }
     }
 }

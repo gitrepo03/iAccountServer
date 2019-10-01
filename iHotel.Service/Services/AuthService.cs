@@ -28,6 +28,11 @@ namespace iHotel.Service.Services
             return await authRepo.CreateRoleAsync(role);
         }
 
+        public LoggedInUserModel GetLoggedInUserClames()
+        {
+            return authRepo.GetLoggedInUserClames();
+        }
+
         public async Task<string> LoginAsync(LoginModel model)
         {
             if (model == null)

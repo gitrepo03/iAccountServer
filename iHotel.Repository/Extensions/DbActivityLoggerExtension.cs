@@ -29,14 +29,9 @@ namespace iHotel.Repository.Extensions
                 ).ToList();
 
             List<String> EntityAllowedWithoutAudId = new List<string>() { "WriteActivityLog", "ChangeLog" };
+            
 
-            ClaimsIdentity clamesIdentity = (ClaimsIdentity)db._httpContextAccessor.HttpContext.User?.Identity;
-
-            LoggedInUserModel loggedUser = new LoggedInUserModel();
-            loggedUser.UserId = clamesIdentity.Claims.SingleOrDefault(c => c.Type == "UserID")?.Value;
-            loggedUser.UserName = clamesIdentity.Claims.SingleOrDefault(c => c.Type == "UserName")?.Value;
-            loggedUser.UserEmail = clamesIdentity.Claims.SingleOrDefault(c => c.Type == "Email")?.Value;
-            loggedUser.Organization = clamesIdentity.Claims.SingleOrDefault(c => c.Type == "Organization")?.Value;
+            LoggedInUserModel loggedUser = new IdentityAuth(db).getLoggedInUserClames();
 
             //Get List of Entityes that doesnot contains value from AuditId(AudId) Property.
             addedEntities.Where(ae =>
@@ -57,7 +52,7 @@ namespace iHotel.Repository.Extensions
             var addedEntityWithout_AudId = addedEntities.Where(ae =>
                    !EntityAllowedWithoutAudId.Contains(ae.Entity.GetType().Name)
                 && ae.Entity is BaseEntity
-            ).ToList();
+            ).Where(wa => string.IsNullOrEmpty(wa.Property("AudId")?.CurrentValue?.ToString()) == true).ToList();
 
             //Check if Entity to add contains AuditId(AudId) or not.
             //If any Entity doesnot contains AuditId(AudId) then throw exception.
@@ -93,7 +88,7 @@ namespace iHotel.Repository.Extensions
                     ActivityType = true,
                     DateBs = currentNepaliDate.Year + "/" + currentNepaliDate.Month + "/" + currentNepaliDate.Day,
                     ActivityBy = loggedUser.UserName,
-                    Organization = int.Parse(loggedUser.Organization)
+                    Organization = loggedUser.Organization != null ? int.Parse(loggedUser.Organization) : 0
                 };
                 //db.Attach(writeActLog).State = EntityState.Added;
                 writeActLogs.Add(writeActLog);
@@ -172,6 +167,9 @@ namespace iHotel.Repository.Extensions
 
         protected static int GetPrimaryKeyValue<T>(IHotelDbContext db, T entity)
         {
+            //TODO: 
+            //This is not ideal for table with multiple primary keys. 
+            //So needed to change this in future.
 
             var test = entity;
             var test2 = test.GetType();

@@ -1,5 +1,6 @@
 ﻿using iHotel.Entity.Accounting;
 using iHotel.Entity.Common;
+using iHotel.Entity.Identity;
 using System;
 using System.Collections.Generic;
 
@@ -19,12 +20,13 @@ namespace iHotel.Entity.Admin
             VoucherMasters = new HashSet<VoucherMaster>();
             VoucherTypes = new HashSet<VoucherType>();
             WriteActivityLogs = new HashSet<WriteActivityLog>();
+            //Users = new HashSet<ApplicationUser>();
         }
         
         public string OrgName { get; set; }
         public string OrgNameNp { get; set; }
         public string PanNo { get; set; }
-        public string FiscalYear { get; set; }
+        //public string FiscalYear { get; set; }
         public string Address { get; set; }
         public string ContactNo { get; set; }
         public string Email { get; set; }
@@ -45,5 +47,6 @@ namespace iHotel.Entity.Admin
         public virtual ICollection<VoucherMaster> VoucherMasters { get; set; }
         public virtual ICollection<VoucherType> VoucherTypes { get; set; }
         public virtual ICollection<WriteActivityLog> WriteActivityLogs { get; set; }
+        //public virtual ICollection<ApplicationUser> Users { get; set; }
     }
 }

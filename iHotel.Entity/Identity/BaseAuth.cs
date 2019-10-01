@@ -4,8 +4,9 @@ using System.Text;
 
 namespace iHotel.Entity.Identity
 {
-    public class LoginModel: BaseAuth
+    public class BaseAuth
     {
-        public string OrganizationCode { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
     }
 }

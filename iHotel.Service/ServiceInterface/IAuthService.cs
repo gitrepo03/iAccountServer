@@ -15,5 +15,6 @@ namespace iHotel.Service.ServiceInterface
         Task<bool> AccountVerificationAsync(string userId, string token);
         Task<bool> PasswordResetRequestAsync(PasswordResetRequest passReset);
         Task<bool> ResetPasswordAsync(ResetPasswordViewModel resetPassVM);
+        LoggedInUserModel GetLoggedInUserClames();
     }
 }

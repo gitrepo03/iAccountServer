@@ -219,13 +219,14 @@ namespace iHotel.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Fiscal")
-                        .IsUnique()
-                        .HasName("UC_FISCALYEAR_FISCALYEAR");
-
                     b.HasIndex("Organization");
 
                     b.HasIndex("User");
+
+                    b.HasIndex("Fiscal", "Organization")
+                        .IsUnique()
+                        .HasName("UC_FISCALYEAR_ORGANIZATION")
+                        .HasFilter("[Organization] IS NOT NULL");
 
                     b.ToTable("FiscalYears");
                 });
@@ -436,8 +437,6 @@ namespace iHotel.Repository.Migrations
                         .HasColumnName("EstablishedDate_BS")
                         .HasMaxLength(10);
 
-                    b.Property<string>("FiscalYear");
-
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("IsActive")
@@ -447,6 +446,7 @@ namespace iHotel.Repository.Migrations
                         .HasMaxLength(200);
 
                     b.Property<string>("OrgCode")
+                        .IsRequired()
                         .HasMaxLength(100);
 
                     b.Property<string>("OrgName")
@@ -469,8 +469,7 @@ namespace iHotel.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrgCode")
-                        .IsUnique()
-                        .HasFilter("[OrgCode] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Organizations");
                 });
@@ -516,13 +515,27 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Admin.UsersOrgs", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AudId");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<int?>("Organization")
+                        .IsRequired();
+
                     b.Property<string>("User");
 
-                    b.Property<int>("Organization");
-
-                    b.HasKey("User", "Organization");
+                    b.HasKey("Id");
 
                     b.HasIndex("Organization");
+
+                    b.HasIndex("User", "Organization")
+                        .IsUnique()
+                        .HasName("UO_UC")
+                        .HasFilter("[User] IS NOT NULL AND [Organization] IS NOT NULL");
 
                     b.ToTable("UsersOrgs");
                 });
@@ -643,8 +656,6 @@ namespace iHotel.Repository.Migrations
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256);
-
-                    b.Property<int>("Organization");
 
                     b.Property<string>("PasswordHash");
 
@@ -852,8 +863,7 @@ namespace iHotel.Repository.Migrations
 
                     b.HasOne("iHotel.Entity.Identity.ApplicationUser", "UserNavigation")
                         .WithMany("Organizations")
-                        .HasForeignKey("User")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("User");
                 });
 
             modelBuilder.Entity("iHotel.Entity.Common.ChangeLog", b =>

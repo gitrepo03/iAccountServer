@@ -24,6 +24,9 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                 entity.HasIndex(e => e.OrgCode)
                     .IsUnique();
 
+                entity.Property(e => e.OrgCode)
+                    .IsRequired();
+
                 //entity.HasIndex(e => e.AudId)
                 //    .IsUnique();
 
@@ -225,8 +228,8 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
 
             modelBuilder.Entity<FiscalYear>(entity =>
             {
-                entity.HasIndex(e => e.Fiscal)
-                    .HasName("UC_FISCALYEAR_FISCALYEAR")
+                entity.HasIndex(e => new { e.Fiscal, e.Organization })
+                    .HasName("UC_FISCALYEAR_ORGANIZATION")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -431,8 +434,11 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
             //MANY TO MANY RELATIONSHIP RULES-----------------------------------------------------------------------
 
 
-            modelBuilder.Entity<UsersOrgs>(entity => {
-                entity.HasKey(e => new { e.User, e.Organization });
+            modelBuilder.Entity<UsersOrgs>(entity =>
+            {
+                entity.HasIndex(e => new { e.User, e.Organization})
+                    .HasName("UO_UC")
+                    .IsUnique();
 
                 entity.Property(e => e.Organization)
                     .IsRequired();
@@ -458,8 +464,8 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                 entity.Property(e => e.UserName)
                     .HasMaxLength(150);
 
-                entity.Property(e => e.Organization)
-                    .IsRequired();
+                //entity.Property(e => e.Organization)
+                //    .IsRequired();
 
                 //entity.HasOne(a => a.OrganizationNavigation)
                 //    .WithMany(o => o.Users)

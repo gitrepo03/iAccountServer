@@ -21,7 +21,7 @@ namespace iHotel.Entity.Identity
         }
 
         public string FullName { get; set; }
-        public int Organization { get; set; }
+        //public int Organization { get; set; }
 
         //public Organization OrganizationNavigation { get; set; }
 

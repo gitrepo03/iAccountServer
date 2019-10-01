@@ -16,5 +16,6 @@ namespace iHotel.Repository.RepoInterface
         Task<bool> PasswordResetRequestAsync(PasswordResetRequest passReset);
         Task<bool> ResetPasswordAsync(ResetPasswordViewModel resetPassVM);
         //Task<bool> sendAccountVerificationCodeAsync(ApplicationUser user);
+        LoggedInUserModel GetLoggedInUserClames();
     }
 }

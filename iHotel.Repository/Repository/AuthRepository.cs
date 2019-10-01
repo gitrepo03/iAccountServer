@@ -1,5 +1,7 @@
 ﻿using iHotel.Entity.Admin;
 using iHotel.Entity.Identity;
+using iHotel.Repository.Extensions.DbExtension;
+using iHotel.Repository.Helper;
 using iHotel.Repository.RepoInterface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -24,19 +26,23 @@ namespace iHotel.Repository.Repository
         private SignInManager<ApplicationUser> _singInManager;
         private readonly ApplicationSetting _appSettings;
         private readonly IEmailSender _emailSender;
+        private readonly IHotelDbContext _db;
 
         public AuthRepository(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
             IOptions<ApplicationSetting> appSettings,
-            IEmailSender emailSender
-        ){
+            IEmailSender emailSender,
+            IHotelDbContext context
+        )
+        {
             _userManager = userManager;
             _roleManager = roleManager;
             _singInManager = signInManager;
             _appSettings = appSettings.Value;
             _emailSender = emailSender;
+            _db = context;
         }
 
         public async Task<string> LoginAsync(LoginModel model)
@@ -48,36 +54,48 @@ namespace iHotel.Repository.Repository
                 {
                     user = await _userManager.FindByEmailAsync(model.UserName);
                 }
-
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                if(user == null)
                 {
-                    IdentityOptions _options = new IdentityOptions();
-                    var roles = await _userManager.GetRolesAsync(user);
-                    var clames = new ClaimsIdentity(new Claim[]
-                        {
+                    //TODO: Implement logic to login using phone number.
+                }
+
+                Organization org = isUserInOrgExist(model.OrganizationCode, user);
+                if (org != null)
+                {
+                    if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                    {
+                        IdentityOptions _options = new IdentityOptions();
+                        var roles = await _userManager.GetRolesAsync(user);
+                        var clames = new ClaimsIdentity(new Claim[]
+                            {
                             new Claim("UserID",user.Id),
                             new Claim("UserName", user.UserName),
                             new Claim("Email", user.Email),
-                            new Claim("Organization", user.Organization.ToString())
-                            //new Claim(_options.ClaimsIdentity.RoleClaimType, roles.FirstOrDefault()),
-                        });
-                    clames.AddClaims(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+                            new Claim("Organization", org.ToString())
+                                //new Claim(_options.ClaimsIdentity.RoleClaimType, roles.FirstOrDefault()),
+                            });
+                        clames.AddClaims(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-                    var expireTime = DateTime.UtcNow.AddDays(1);
-                    SigningCredentials cred = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature);
-                    var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = clames,
-                        Expires = expireTime,
-                        SigningCredentials = cred
-                    };
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-                    var token = tokenHandler.WriteToken(securityToken);
-                    return token;
+                        var expireTime = DateTime.UtcNow.AddDays(1);
+                        SigningCredentials cred = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256Signature);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = clames,
+                            Expires = expireTime,
+                            SigningCredentials = cred
+                        };
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                        var token = tokenHandler.WriteToken(securityToken);
+                        return token;
+                    }
+                    else
+                        throw new InvalidDataException("Username or password is incorrect.");
                 }
                 else
-                    throw new InvalidDataException("Username or password is incorrect.");
+                {
+                    throw new InvalidDataException("User doesnot exist in organization with organization Code '"+model.OrganizationCode+"'");
+                }
             }
             catch (Exception ex)
             {
@@ -92,8 +110,7 @@ namespace iHotel.Repository.Repository
                 UserName = model.UserName,
                 Email = model.Email,
                 FullName = model.FullName,
-                PhoneNumber = model.PhoneNumber,
-                Organization = model.Organization
+                PhoneNumber = model.PhoneNumber
             };
 
             try
@@ -102,6 +119,9 @@ namespace iHotel.Repository.Repository
                 bool isAccountVerificationMailSendSucceed = false;
 
                 IdentityResult result = await _userManager.CreateAsync(applicationUser, model.Password);
+
+                
+
                 if (result.Succeeded)
                 {
                     if (!_roleManager.RoleExistsAsync("SuperAdminDeveloper").Result)
@@ -117,6 +137,16 @@ namespace iHotel.Repository.Repository
 
                 if (result.Succeeded && roleRes.Succeeded)
                 {
+                    ApplicationUser newlyCreatedUser = new ApplicationUser()
+                    {
+                        Email = model.Email,
+                        PhoneNumber = model.PhoneNumber,
+                        UserName = model.UserName,
+                        FullName = model.FullName
+                    };
+                    ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+                    await createUsersOrgs(model.Organization, user.Id);
+
                     isAccountVerificationMailSendSucceed = await sendAccountVerificationCodeAsync(applicationUser);
                 }
 
@@ -244,6 +274,46 @@ namespace iHotel.Repository.Repository
             {
                 throw ex;
             }
+        }
+
+        private Organization isUserInOrgExist(string orgCode, ApplicationUser user)
+        {
+            Organization org = _db.Organizations.SingleOrDefault(o => o.OrgCode == orgCode);
+            if(org == null)
+            {
+                throw new InvalidDataException("Organization with organization code '" + orgCode + "' don\'t exist");
+            }
+
+            UsersOrgs userOrgs = _db.UsersOrgs.SingleOrDefault(uo => uo.Organization == org.Id && uo.User == user.Id);
+            if(userOrgs != null)
+            {
+                return org;
+            }
+            return null;
+        }
+
+        public async Task<bool> createUsersOrgs(int org, string user)
+        {
+            UsersOrgs usersOrg = new UsersOrgs()
+            {
+                Organization = org,
+                User = user
+            };
+
+            _db.Add(usersOrg);
+            try
+            {
+                await _db.SaveChangesAsync();
+                return true;
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public LoggedInUserModel GetLoggedInUserClames()
+        {
+            return new IdentityAuth(_db).getLoggedInUserClames();
         }
     }
 }

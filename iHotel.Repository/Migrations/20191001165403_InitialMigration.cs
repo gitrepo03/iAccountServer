@@ -41,8 +41,7 @@ namespace iHotel.Repository.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    FullName = table.Column<string>(nullable: true),
-                    Organization = table.Column<int>(nullable: false)
+                    FullName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -59,7 +58,6 @@ namespace iHotel.Repository.Migrations
                     OrgName = table.Column<string>(unicode: false, maxLength: 200, nullable: true),
                     OrgName_Np = table.Column<string>(maxLength: 500, nullable: true),
                     PanNo = table.Column<string>(maxLength: 50, nullable: true),
-                    FiscalYear = table.Column<string>(nullable: true),
                     Address = table.Column<string>(maxLength: 500, nullable: true),
                     ContactNo = table.Column<string>(maxLength: 100, nullable: true),
                     Email = table.Column<string>(maxLength: 100, nullable: true),
@@ -68,7 +66,7 @@ namespace iHotel.Repository.Migrations
                     EstablishedDate_BS = table.Column<string>(maxLength: 10, nullable: true),
                     Logo = table.Column<string>(maxLength: 200, nullable: true),
                     Quote = table.Column<string>(maxLength: 1000, nullable: true),
-                    OrgCode = table.Column<string>(maxLength: 100, nullable: true)
+                    OrgCode = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -277,12 +275,16 @@ namespace iHotel.Repository.Migrations
                 name: "UsersOrgs",
                 columns: table => new
                 {
-                    User = table.Column<string>(nullable: false),
-                    Organization = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    IsActive = table.Column<bool>(nullable: false),
+                    AudId = table.Column<string>(nullable: true),
+                    Organization = table.Column<int>(nullable: false),
+                    User = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsersOrgs", x => new { x.User, x.Organization });
+                    table.PrimaryKey("PK_UsersOrgs", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UsersOrgs_Organizations_Organization",
                         column: x => x.Organization,
@@ -294,7 +296,7 @@ namespace iHotel.Repository.Migrations
                         column: x => x.User,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -593,12 +595,6 @@ namespace iHotel.Repository.Migrations
                 column: "Organization");
 
             migrationBuilder.CreateIndex(
-                name: "UC_FISCALYEAR_FISCALYEAR",
-                table: "FiscalYears",
-                column: "Fiscal",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FiscalYears_Organization",
                 table: "FiscalYears",
                 column: "Organization");
@@ -607,6 +603,13 @@ namespace iHotel.Repository.Migrations
                 name: "IX_FiscalYears_User",
                 table: "FiscalYears",
                 column: "User");
+
+            migrationBuilder.CreateIndex(
+                name: "UC_FISCALYEAR_ORGANIZATION",
+                table: "FiscalYears",
+                columns: new[] { "Fiscal", "Organization" },
+                unique: true,
+                filter: "[Organization] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LedgerRefs_Organization",
@@ -650,13 +653,19 @@ namespace iHotel.Repository.Migrations
                 name: "IX_Organizations_OrgCode",
                 table: "Organizations",
                 column: "OrgCode",
-                unique: true,
-                filter: "[OrgCode] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersOrgs_Organization",
                 table: "UsersOrgs",
                 column: "Organization");
+
+            migrationBuilder.CreateIndex(
+                name: "UO_UC",
+                table: "UsersOrgs",
+                columns: new[] { "User", "Organization" },
+                unique: true,
+                filter: "[User] IS NOT NULL AND [Organization] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VoucherDetails_LedgerCode",

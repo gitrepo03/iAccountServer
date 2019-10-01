@@ -4,7 +4,7 @@ using System.Text;
 
 namespace iHotel.Entity.Identity
 {
-    public class UserModel: LoginModel
+    public class UserModel: BaseAuth
     {
         public string Email { get; set; }
         public string FullName { get; set; }
