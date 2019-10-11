@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -27,6 +26,7 @@ namespace iHotel.Repository.Repository
         private readonly ApplicationSetting _appSettings;
         private readonly IEmailSender _emailSender;
         private readonly IHotelDbContext _db;
+        private readonly IUserRepository _userRepo;
 
         public AuthRepository(
             UserManager<ApplicationUser> userManager,
@@ -34,7 +34,8 @@ namespace iHotel.Repository.Repository
             SignInManager<ApplicationUser> signInManager,
             IOptions<ApplicationSetting> appSettings,
             IEmailSender emailSender,
-            IHotelDbContext context
+            IHotelDbContext context,
+            IUserRepository userRepo
         )
         {
             _userManager = userManager;
@@ -43,6 +44,7 @@ namespace iHotel.Repository.Repository
             _appSettings = appSettings.Value;
             _emailSender = emailSender;
             _db = context;
+            _userRepo = userRepo;
         }
 
         public async Task<string> LoginAsync(LoginModel model)
@@ -59,6 +61,11 @@ namespace iHotel.Repository.Repository
                     //TODO: Implement logic to login using phone number.
                 }
 
+                if (user == null)
+                {
+                    throw new InvalidDataException("Username or password is incorrect.");
+                }
+
                 Organization org = isUserInOrgExist(model.OrganizationCode, user);
                 if (org != null)
                 {
@@ -71,7 +78,7 @@ namespace iHotel.Repository.Repository
                             new Claim("UserID",user.Id),
                             new Claim("UserName", user.UserName),
                             new Claim("Email", user.Email),
-                            new Claim("Organization", org.ToString())
+                            new Claim("Organization", org.Id.ToString())
                                 //new Claim(_options.ClaimsIdentity.RoleClaimType, roles.FirstOrDefault()),
                             });
                         clames.AddClaims(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -313,7 +320,7 @@ namespace iHotel.Repository.Repository
 
         public LoggedInUserModel GetLoggedInUserClames()
         {
-            return new IdentityAuth(_db).getLoggedInUserClames();
+            return _userRepo.UsersClames();
         }
     }
 }

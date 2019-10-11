@@ -15,6 +15,7 @@ namespace iHotelManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FiscalController : ControllerBase
     {
         private readonly IFiscalService _service;

@@ -1,5 +1,6 @@
 ﻿using iHotel.Entity.Accounting;
 using iHotel.Repository.Extensions.DbExtension;
+using iHotel.Repository.RepoInterface;
 using iHotel.Repository.SignalRHub;
 using System;
 using System.Collections.Generic;

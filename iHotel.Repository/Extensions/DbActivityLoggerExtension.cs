@@ -2,6 +2,7 @@
 using iHotel.Entity.Identity;
 using iHotel.Repository.Extensions.DbExtension;
 using iHotel.Repository.Helper;
+using iHotel.Repository.RepoInterface;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,19 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace iHotel.Repository.Extensions
 {
     public class DbActivityLoggerExtension
     {
-        public static void LogDataWriteActivity(IHotelDbContext db)
+        //private readonly IUserRepository _userRepo;
+        //public DbActivityLoggerExtension(IUserRepository userRepo)
+        //{
+        //    _userRepo = userRepo;
+        //}
+
+        public async Task LogDataWriteActivity(IHotelDbContext db)
         {
             //Get all Entities which has state of Added
             var addedEntities = db.ChangeTracker.Entries()
@@ -29,9 +37,12 @@ namespace iHotel.Repository.Extensions
                 ).ToList();
 
             List<String> EntityAllowedWithoutAudId = new List<string>() { "WriteActivityLog", "ChangeLog" };
-            
 
-            LoggedInUserModel loggedUser = new IdentityAuth(db).getLoggedInUserClames();
+
+            LoggedInUserModel loggedUser = IdentityAuth.getLoggedInUserClames(db);
+            List<String> usersRoles = IdentityAuth.getLoggedInUsersRole(db, loggedUser.UserId);
+            //LoggedInUserModel loggedUser = userRepo.UsersClames();
+            //List<String> usersRoles = await userRepo.UsersRoles(loggedUser.UserId);
 
             //Get List of Entityes that doesnot contains value from AuditId(AudId) Property.
             addedEntities.Where(ae =>
@@ -42,10 +53,31 @@ namespace iHotel.Repository.Extensions
                 var orgProp = ae.Metadata.FindProperty("Organization");
                 if (orgProp != null)
                 {
+                    //add same organization to the entity as loggedIn user's
+
+                    //get OrganizationProperty from entity.
                     var org = ae.Property("Organization");
+                    //get current value of organization.
                     var orgCurValue = int.Parse(org.CurrentValue.ToString());
-                    var isOrgHasValue = orgCurValue <= 0;
-                    ae.Property("Organization").CurrentValue = (isOrgHasValue ? int.Parse(loggedUser.Organization) : org.CurrentValue);
+                    bool isUserSuperAdminDeveloper = usersRoles.SingleOrDefault(r => r == "SuperAdminDeveloper") != null;
+                    
+                    //cheque if organization has value.
+                    bool isOrgHasValue = orgCurValue > 0;
+
+                    //If user who is adding data is in SuperAdminDeveloper role then organization is required.
+                    if (isUserSuperAdminDeveloper)
+                    {
+                        if (!isOrgHasValue) {
+                            throw new InvalidDataException("Organization is required.");
+                        }
+                    }
+                    else
+                    {
+                        //Set organization for entity.
+                        ae.Property("Organization").CurrentValue = int.Parse(loggedUser.Organization);
+                    }
+
+                    
                 }
             });
 
@@ -78,7 +110,9 @@ namespace iHotel.Repository.Extensions
                 {
                     continue;
                 }
-                var entityName = newEntry.Entity.GetType().Name;
+                string entityName = newEntry.Entity.GetType().Name;
+                string curAudId = newEntry.Property("AudId").CurrentValue.ToString();
+                string dateBs = currentNepaliDate.Year + "/" + currentNepaliDate.Month + "/" + currentNepaliDate.Day;
                 var primaryKeyValue = GetPrimaryKeyValue(db, newEntry.Entity);
 
                 WriteActivityLog writeActLog = new WriteActivityLog()
@@ -163,7 +197,7 @@ namespace iHotel.Repository.Extensions
             //this.Attach(WriteActivityLogs).State = EntityState.Added;
         }
 
-        #region LogDataWriteActivity Method's Helper Methods
+        #region LogDataWriteActivity Class's Helper Methods
 
         protected static int GetPrimaryKeyValue<T>(IHotelDbContext db, T entity)
         {

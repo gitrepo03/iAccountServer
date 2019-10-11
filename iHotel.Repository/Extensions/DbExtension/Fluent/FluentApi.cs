@@ -89,6 +89,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasForeignKey(d => d.Organization)
                     .HasConstraintName("FK__Organizat__organ__52593CB8");
 
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
                 entity.HasIndex(e => e.AudId)
                     .IsUnique();
 
@@ -113,6 +117,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                    .WithMany(o => o.WriteActivityLogs)
                    .HasForeignKey(w => w.Organization)
                    .HasConstraintName("FK__Organizat__WriteActLog__5B23C598");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Organization)
                     .IsRequired();
@@ -147,6 +155,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                    .WithMany(o => o.ChangeLogs)
                    .HasForeignKey(w => w.Organization)
                    .HasConstraintName("FK__Organizat__ChangeLog__5B23C598");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Organization)
                     .IsRequired();
@@ -183,7 +195,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("ACCOUNTREF_FISCALYEAR_GROUPCODE")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Bs)
                     .IsRequired()
@@ -207,6 +222,11 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .IsRequired()
                     .HasColumnName("TB")
                     .HasMaxLength(1);
+
+                entity.HasOne(ar => ar.AccountRefNavigation)
+                    .WithMany(arp => arp.AccountRefs)
+                    .HasForeignKey(ar => ar.Parent)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ar => ar.OrganizationNavigation)
                    .WithMany(o => o.AccountRefs)
@@ -232,7 +252,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("UC_FISCALYEAR_ORGANIZATION")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.DateBeginEnglish).HasColumnType("datetime");
 
@@ -267,7 +290,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("LEDGERREF_FISCALYEAR_LEDGERCODE_GROUPCODE")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.BalanceType)
                     .IsRequired()
@@ -305,7 +331,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("UC_Voucherdetail_Fiscalyear_vouchernumber_vouchertype_serialnumber_ledgercode")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Amount).HasColumnType("money");
 
@@ -355,7 +384,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("VM_UC")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.DateEnglish).HasColumnType("datetime");
 
@@ -408,7 +440,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("UC_VOUCHERTYPE_VOUCHERCODE")
                     .IsUnique();
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                //entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.VoucherCode)
                     .IsRequired()
@@ -440,6 +475,10 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                     .HasName("UO_UC")
                     .IsUnique();
 
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
                 entity.Property(e => e.Organization)
                     .IsRequired();
 
@@ -459,8 +498,6 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
 
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                entity.HasKey(e => e.Id);
-
                 entity.Property(e => e.UserName)
                     .HasMaxLength(150);
 

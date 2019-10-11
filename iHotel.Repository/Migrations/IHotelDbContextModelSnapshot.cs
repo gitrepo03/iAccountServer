@@ -131,7 +131,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.AccountRef", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AudId");
 
@@ -178,6 +180,8 @@ namespace iHotel.Repository.Migrations
 
                     b.HasIndex("Organization");
 
+                    b.HasIndex("Parent");
+
                     b.HasIndex("User");
 
                     b.HasIndex("Fiscal", "GroupCode")
@@ -189,7 +193,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.FiscalYear", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AudId");
 
@@ -233,7 +239,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.LedgerRef", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AudId");
 
@@ -278,7 +286,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.VoucherDetail", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("money");
@@ -330,7 +340,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.VoucherMaster", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AudId");
 
@@ -383,7 +395,9 @@ namespace iHotel.Repository.Migrations
 
             modelBuilder.Entity("iHotel.Entity.Accounting.VoucherType", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AudId");
 
@@ -740,6 +754,11 @@ namespace iHotel.Repository.Migrations
                         .WithMany("AccountRefs")
                         .HasForeignKey("Organization")
                         .HasConstraintName("FK__Org__AccRef__5B23C598");
+
+                    b.HasOne("iHotel.Entity.Accounting.AccountRef", "AccountRefNavigation")
+                        .WithMany("AccountRefs")
+                        .HasForeignKey("Parent")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("iHotel.Entity.Identity.ApplicationUser", "UserNavigation")
                         .WithMany("AccountRefs")

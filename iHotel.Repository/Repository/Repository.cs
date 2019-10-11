@@ -1,6 +1,9 @@
-﻿using iHotel.Entity.Common;
+﻿using iHotel.Entity.Admin;
+using iHotel.Entity.Common;
 using iHotel.Entity.Helper;
+using iHotel.Entity.Identity;
 using iHotel.Repository.Extensions.DbExtension;
+using iHotel.Repository.Helper;
 using iHotel.Repository.RepoInterface;
 using iHotel.Repository.SignalRHub;
 using Microsoft.EntityFrameworkCore;
@@ -37,22 +40,23 @@ namespace iHotel.Repository.Repository
             {
                 throw new ArgumentNullException("Entity to save must not be null.");
             }
+
             //db.Attach(entity).State = EntityState.Added;
             var savedData = db.Add(entity).Entity;
 
             await db.SaveChangesAsync();
 
-            List<T> dataToBroadcast = new List<T>() {
-                savedData
-            };
-            await orgHub.Send(
-                SignalRSignalTypes.Added,
-                new HubResponse<T>()
-                {
-                    Data = dataToBroadcast,
-                    HubDataState = HubDataState.Added
-                }
-            );
+            //List<T> dataToBroadcast = new List<T>() {
+            //    savedData
+            //};
+            //await orgHub.Send(
+            //    SignalRSignalTypes.Added,
+            //    new HubResponse<T>()
+            //    {
+            //        Data = dataToBroadcast,
+            //        HubDataState = HubDataState.Added
+            //    }
+            //);
 
             return savedData;
         }

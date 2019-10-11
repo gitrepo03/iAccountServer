@@ -1,6 +1,7 @@
 ﻿using iHotel.Entity.Accounting;
 using iHotel.Entity.Admin;
 using iHotel.Entity.Identity;
+using iHotel.Repository.Extensions;
 using iHotel.Repository.Extensions.DbExtension;
 using iHotel.Repository.RepoInterface;
 using iHotel.Repository.Repository;
@@ -21,8 +22,11 @@ namespace iHotelManagement
     {
         #region DataContextRegion
 
-        public static void AddDbContext(this IServiceCollection services,
-            string dataConnectionString = null, string authConnectionString = null)
+        public static void AddDbContext(
+            this IServiceCollection services,
+            string dataConnectionString = null, 
+            string authConnectionString = null
+        )
         {
             services.AddDbContext<IHotelDbContext>(options =>
                     options.UseSqlServer(dataConnectionString ?? GetDataConnectionStringFromConfig()));
@@ -59,6 +63,8 @@ namespace iHotelManagement
         {
             //services.AddScoped(typeof(IRepository<>), typeof(DataRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IUserRepository, UsersRepository>();
+            //services.AddScoped<IDataLoggerExtension, DbActivityLoggerExtension>();
             services.AddScoped<IRepository<Organization>, OrganizationRepository>();
             services.AddScoped<IRepository<FiscalYear>, FiscalRepository>();
             services.AddScoped<IRepository<LedgerRef>, LedgerRefRepository>();

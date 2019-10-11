@@ -3,12 +3,11 @@ using iHotel.Entity.Admin;
 using iHotel.Entity.Common;
 using iHotel.Entity.Identity;
 using iHotel.Repository.Extensions.DbExtension.Fluent;
+using iHotel.Repository.RepoInterface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,10 +17,13 @@ namespace iHotel.Repository.Extensions.DbExtension
     {
         public readonly IHttpContextAccessor _httpContextAccessor;
 
-        public IHotelDbContext(DbContextOptions<IHotelDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
+        public IHotelDbContext(
+            DbContextOptions<IHotelDbContext> options,
+            IHttpContextAccessor httpContextAccessor
+        ) : base(options)
         {
             this._httpContextAccessor = httpContextAccessor;
-        }
+    }
 
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<OrganizationImagePath> OrganizationImagePaths { get; set; }
@@ -47,17 +49,22 @@ namespace iHotel.Repository.Extensions.DbExtension
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             this.ChangeTracker.DetectChanges();
-            DbActivityLoggerExtension.LogDataWriteActivity(this);
+            //_dataLogger.LogDataWriteActivity(this);
+            new DbActivityLoggerExtension().LogDataWriteActivity(this);
 
             return base.SaveChanges();
         }
 
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        public async override Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess, 
+            CancellationToken cancellationToken = default(CancellationToken)
+        )
         {
             this.ChangeTracker.DetectChanges();
-            DbActivityLoggerExtension.LogDataWriteActivity(this);
+            //await _dataLogger.LogDataWriteActivity(this);
+            new DbActivityLoggerExtension().LogDataWriteActivity(this);
 
-            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
         #endregion

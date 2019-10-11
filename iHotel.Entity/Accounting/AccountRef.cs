@@ -11,6 +11,7 @@ namespace iHotel.Entity.Accounting
         public AccountRef()
         {
             LedgerRefs = new HashSet<LedgerRef>();
+            AccountRefs = new HashSet<AccountRef>();
         }
         
         public string Fiscal { get; set; }
@@ -25,6 +26,9 @@ namespace iHotel.Entity.Accounting
         public bool HasSubLedger { get; set; }
 
         public virtual FiscalYear FiscalNavigation { get; set; }
+        public virtual AccountRef AccountRefNavigation { get; set; }
+
         public virtual ICollection<LedgerRef> LedgerRefs { get; set; }
+        public virtual ICollection<AccountRef> AccountRefs { get; set; }
     }
 }

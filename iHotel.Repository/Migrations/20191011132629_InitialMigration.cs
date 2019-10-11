@@ -211,7 +211,8 @@ namespace iHotel.Repository.Migrations
                 name: "FiscalYears",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -303,7 +304,8 @@ namespace iHotel.Repository.Migrations
                 name: "VoucherTypes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -360,7 +362,8 @@ namespace iHotel.Repository.Migrations
                 name: "AccountRef",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -393,6 +396,12 @@ namespace iHotel.Repository.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_AccountRef_AccountRef_Parent",
+                        column: x => x.Parent,
+                        principalTable: "AccountRef",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK__AppUser__AccRef__5B23C598",
                         column: x => x.User,
                         principalTable: "AspNetUsers",
@@ -404,7 +413,8 @@ namespace iHotel.Repository.Migrations
                 name: "VoucherMasters",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -452,7 +462,8 @@ namespace iHotel.Repository.Migrations
                 name: "LedgerRefs",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -491,7 +502,8 @@ namespace iHotel.Repository.Migrations
                 name: "VoucherDetails",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IsActive = table.Column<bool>(nullable: false),
                     AudId = table.Column<string>(nullable: true),
                     Organization = table.Column<int>(nullable: true),
@@ -538,6 +550,11 @@ namespace iHotel.Repository.Migrations
                 name: "IX_AccountRef_Organization",
                 table: "AccountRef",
                 column: "Organization");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountRef_Parent",
+                table: "AccountRef",
+                column: "Parent");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccountRef_User",

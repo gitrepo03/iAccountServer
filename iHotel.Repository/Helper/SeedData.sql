@@ -71,7 +71,7 @@ INSERT INTO [dbo].[Organizations]
            ,'ramjigautam.com.np'
            ,'Default');
 
-declare @userId varchar(50);
+--declare @userId varchar(50);
 declare @orgId varchar(50);
 
 select @userId = (select TOP 1 id from AspNetUsers where Email = 'ramji.gautam24@gmail.com');

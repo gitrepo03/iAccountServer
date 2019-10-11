@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using iHotel.Entity.Identity;
+using iHotel.Repository.RepoInterface;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System;
@@ -19,6 +22,7 @@ namespace iHotel.Repository.Extensions.DbExtension
         public DbContextFactory(IHttpContextAccessor httpContext)
         {
             _httpContext = httpContext;
+
         }
 
         private static string DataConnectionString => new DbConfig().GetDataConnectionString();
