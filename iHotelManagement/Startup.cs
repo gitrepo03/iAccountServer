@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using iHotel.Entity.Accounting;
 using iHotel.Entity.Admin;
 using iHotel.Entity.Identity;
 using iHotel.Repository.SignalRHub;
@@ -206,6 +207,12 @@ namespace iHotelManagement
                 //(cause we hav configured hub authentication with url that starts with /hub)
                 //If we dont prefix our rout with /hub then authentication will fail.
                 routes.MapHub<AppHub<Organization>>("/hub/org");
+                routes.MapHub<AppHub<FiscalYear>>("/hub/fiscal");
+                routes.MapHub<AppHub<AccountRef>>("/hub/accountref");
+                routes.MapHub<AppHub<LedgerRef>>("/hub/ledgerref");
+                routes.MapHub<AppHub<FiscalYear>>("/hub/vouchertype");
+                routes.MapHub<AppHub<AccountRef>>("/hub/vouchermaster");
+                routes.MapHub<AppHub<LedgerRef>>("/hub/voucherdetail");
             });
 
             app.UseMvc(routes =>

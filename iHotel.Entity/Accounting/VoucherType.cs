@@ -18,4 +18,15 @@ namespace iHotel.Entity.Accounting
         
         public virtual ICollection<VoucherMaster> VoucherMasters { get; set; }
     }
+
+    public class VoucherType_R: VoucherType
+    {
+        public string OrgName { get; set; }
+        public string C_User { get; set; }
+        public string C_On_BS { get; set; }
+        public string C_On_AD { get; set; }
+        public string U_User { get; set; }
+        public string U_On_BS { get; set; }
+        public string U_On_AD { get; set; }
+    }
 }

@@ -11,11 +11,11 @@ namespace iHotel.Service.ServiceInterface
         //Count total Active data from database.
         Task<int> CountAsync();
         //Get all Active data.
-        IQueryable<T> Get();
-        //Get a single data with id.
-        Task<T> GetAsync(int id);
-        //Get all.
-        IQueryable<T> GetAll();
+        //IQueryable<T> Get();
+        ////Get a single data with id.
+        //IQueryable<T> GetById(int id);
+        ////Get all.
+        //IQueryable<T> GetAll();
         //Insert a single data to table.
         Task<T> CreateAsync(T entity);
         //Insert a range of data to table.

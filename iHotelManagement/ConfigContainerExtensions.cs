@@ -1,5 +1,6 @@
 ﻿using iHotel.Entity.Accounting;
 using iHotel.Entity.Admin;
+using iHotel.Entity.Common;
 using iHotel.Entity.Identity;
 using iHotel.Repository.Extensions;
 using iHotel.Repository.Extensions.DbExtension;
@@ -64,6 +65,7 @@ namespace iHotelManagement
             //services.AddScoped(typeof(IRepository<>), typeof(DataRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IUserRepository, UsersRepository>();
+            services.AddScoped<IReadRepository<WriteActivityLog>, ReadRepository<WriteActivityLog>>();
             //services.AddScoped<IDataLoggerExtension, DbActivityLoggerExtension>();
             services.AddScoped<IRepository<Organization>, OrganizationRepository>();
             services.AddScoped<IRepository<FiscalYear>, FiscalRepository>();
@@ -85,12 +87,15 @@ namespace iHotelManagement
         {
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IOrganizationService, OrganizationService>();
+
             services.AddTransient<IFiscalService, FiscalService>();
             services.AddTransient<ILedgerRefService, LedgerRefService>();
             services.AddTransient<IAccountRefService, AccountRefService>();
             services.AddTransient<IVoucherTypeService, VoucherTypeService>();
             services.AddTransient<IVoucherMasterService, VoucherMasterService>();
             services.AddTransient<IVoucherDetailService, VoucherDetailService>();
+
+
         }
 
         #endregion

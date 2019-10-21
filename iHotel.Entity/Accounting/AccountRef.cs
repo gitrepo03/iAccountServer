@@ -31,4 +31,15 @@ namespace iHotel.Entity.Accounting
         public virtual ICollection<LedgerRef> LedgerRefs { get; set; }
         public virtual ICollection<AccountRef> AccountRefs { get; set; }
     }
+
+    public class AccountRef_R: AccountRef
+    {
+        public string OrgName { get; set; }
+        public string C_User { get; set; }
+        public string C_On_BS { get; set; }
+        public string C_On_AD { get; set; }
+        public string U_User { get; set; }
+        public string U_On_BS { get; set; }
+        public string U_On_AD { get; set; }
+    }
 }

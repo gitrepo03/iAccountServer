@@ -5,5 +5,5 @@ using System.Text;
 
 namespace iHotel.Service.ServiceInterface
 {
-    public interface IVoucherDetailService : ICoreService<VoucherDetail> { }
+    public interface IVoucherDetailService : ICoreService<VoucherDetail>, ICoreService_R<VoucherDetail_R> { }
 }

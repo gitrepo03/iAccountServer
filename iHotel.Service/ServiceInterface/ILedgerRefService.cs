@@ -5,5 +5,5 @@ using System.Text;
 
 namespace iHotel.Service.ServiceInterface
 {
-    public interface ILedgerRefService : ICoreService<LedgerRef> { }
+    public interface ILedgerRefService : ICoreService<LedgerRef>, ICoreService_R<LedgerRef_R> { }
 }

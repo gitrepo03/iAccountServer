@@ -121,7 +121,8 @@ namespace iHotel.Repository.Extensions
                     AudId = newEntry.Property("AudId").CurrentValue.ToString(),
                     ActivityType = true,
                     DateBs = currentNepaliDate.Year + "/" + currentNepaliDate.Month + "/" + currentNepaliDate.Day,
-                    ActivityBy = loggedUser.UserName,
+                    //ActivityBy = loggedUser.UserName,
+                    User = loggedUser.UserName,
                     Organization = loggedUser.Organization != null ? int.Parse(loggedUser.Organization) : 0
                 };
                 //db.Attach(writeActLog).State = EntityState.Added;
@@ -153,7 +154,8 @@ namespace iHotel.Repository.Extensions
                         AudId = change.Property("AudId").CurrentValue.ToString(),
                         ActivityType = false,
                         DateBs = currentNepaliDate.Year + "/" + currentNepaliDate.Month + "/" + currentNepaliDate.Day,
-                        ActivityBy = loggedUser.UserName,
+                        //ActivityBy = loggedUser.UserName,
+                        User = loggedUser.UserName,
                         Organization = int.Parse(loggedUser.Organization)
                     };
                     writeActLogs.Add(writeActLog);

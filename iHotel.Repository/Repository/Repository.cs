@@ -1,5 +1,4 @@
-﻿using iHotel.Entity.Admin;
-using iHotel.Entity.Common;
+﻿using iHotel.Entity.Common;
 using iHotel.Entity.Helper;
 using iHotel.Entity.Identity;
 using iHotel.Repository.Extensions.DbExtension;
@@ -11,23 +10,29 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace iHotel.Repository.Repository
 {
-    public abstract class Repository<T> : IRepository<T> where T : EntityBase
+    public abstract class Repository<T> : ReadRepository<T>, IRepository<T> where T : EntityBase
     {
         private readonly IHotelDbContext db;
         private DbSet<T> entities;
         private readonly AppHub<T> orgHub;
 
-        public Repository(IHotelDbContext context, AppHub<T> orgHub)
+        public Repository(IHotelDbContext context, AppHub<T> _orgHub) : base(context)
         {
             db = context;
             entities = context.Set<T>();
-            this.orgHub = orgHub;
+            orgHub = _orgHub;
         }
+
+        //public Repository(IHotelDbContext context, AppHub<T> orgHub)
+        //{
+        //    db = context;
+        //    entities = context.Set<T>();
+        //    this.orgHub = orgHub;
+        //}
 
         public async Task<int> CountAsync()
         {
@@ -159,25 +164,25 @@ namespace iHotel.Repository.Repository
             return entities;
         }
 
-        public IQueryable<T> GetAll()
-        {
-            return entities;
-        }
+        //public IQueryable<T> GetAll()
+        //{
+        //    return entities;
+        //}
 
-        public IQueryable<T> Get()
-        {
-            return GetAll().Where(es => es.IsActive == true);
-        }
+        //public IQueryable<T> Get()
+        //{
+        //    return GetAll().Where(es => es.IsActive == true);
+        //}
 
-        public async Task<T> GetAsync(int id)
-        {
-            if (id <= 0)
-            {
-                throw new InvalidDataException("Id must be greater than zero.");
-            }
-            //return entities.SingleOrDefault(e => e.Id == id);
-            return await Get().Where(e => e.IsActive && e.Id == id).SingleOrDefaultAsync();
-        }
+        //public IQueryable<T> GetById(int id)
+        //{
+        //    if (id <= 0)
+        //    {
+        //        throw new InvalidDataException("Id must be greater than zero.");
+        //    }
+        //    //return entities.SingleOrDefault(e => e.Id == id);
+        //    return Get().Where(e => e.IsActive && e.Id == id);
+        //}
 
         public async Task<T> InactivateAsync(int id)
         {
@@ -250,6 +255,15 @@ namespace iHotel.Repository.Repository
             await db.SaveChangesAsync();
             return lisOfDataToDelete;
         }
-        
+
+        public LoggedInUserModel UsersClame()
+        {
+            return IdentityAuth.getLoggedInUserClames(db);
+        }
+
+        public List<string> UsersRoles(string userId)
+        {
+            return IdentityAuth.getLoggedInUsersRole(db, userId);
+        }
     }
 }

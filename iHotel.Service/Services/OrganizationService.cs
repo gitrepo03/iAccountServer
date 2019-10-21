@@ -53,9 +53,9 @@ namespace iHotel.Service.Services
             return repo.GetAll();
         }
 
-        public async Task<Organization> GetAsync(int id)
+        public IQueryable<Organization> GetById(int id)
         {
-            return await repo.GetAsync(id);
+            return repo.GetById(id);
         }
 
         public async Task<Organization> InactivateAsync(int id)

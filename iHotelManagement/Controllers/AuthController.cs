@@ -49,10 +49,11 @@ namespace iHotelManagement.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             try
-             {
+            {
                 string token = await authService.LoginAsync(model);
                 return Ok(new { token });
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }
@@ -68,7 +69,8 @@ namespace iHotelManagement.Controllers
             {
                 IdentityRole generatedRole = await authService.CreateRoleAsync(role);
                 return Ok(generatedRole);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }
@@ -80,12 +82,13 @@ namespace iHotelManagement.Controllers
         {
             try
             {
-                if(await authService.AccountVerificationAsync(userId, token))
+                if (await authService.AccountVerificationAsync(userId, token))
                 {
                     return Ok("Account verification successful.");
                 }
                 return BadRequest("Problem during account verification process.");
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }
@@ -97,7 +100,7 @@ namespace iHotelManagement.Controllers
         {
             try
             {
-                if(await authService.PasswordResetRequestAsync(passReset))
+                if (await authService.PasswordResetRequestAsync(passReset))
                 {
                     return Ok("Password reset link has been sent to your email address!");
                 }
@@ -120,7 +123,8 @@ namespace iHotelManagement.Controllers
                     return Ok("Password reset successful!");
                 }
                 return BadRequest("Error while resetting the password!");
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }

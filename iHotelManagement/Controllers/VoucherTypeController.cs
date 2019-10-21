@@ -25,12 +25,62 @@ namespace iHotelManagement.Controllers
         }
 
 
-        // GET: api/VoucherType/All
+        //// GET: api/VoucherType/All
+        //[EnableQuery]
+        //[HttpGet]
+        //[Authorize(Roles = "SuperAdminDeveloper, Developer")]
+        //[Route("All")]
+        //public async Task<ActionResult<IEnumerable<VoucherType>>> GetAllWithInactive()
+        //{
+        //    try
+        //    {
+        //        return await _service.GetAll().ToListAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+        //    }
+        //}
+
+        //// GET: api/VoucherType/GetAll
+        //[EnableQuery]
+        //[HttpGet]
+        //[Authorize(Roles = "SuperAdminDeveloper, Developer")]
+        //[HttpGet]
+        //[Route("GetAll")]
+        //public async Task<ActionResult<IEnumerable<VoucherType>>> GetAll()
+        //{
+        //    try
+        //    {
+        //        var orgDetails = await _service.Get().ToListAsync();
+        //        return orgDetails;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+        //    }
+        //}
+
+        //// GET: api/VoucherType/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<VoucherType>> Get(int id)
+        //{
+        //    try
+        //    {
+        //        return await _service.GetAsync(id);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+        //    }
+        //}
+
+        // GET: api/Fiscal/SADGetAll
         [EnableQuery]
         [HttpGet]
         [Authorize(Roles = "SuperAdminDeveloper, Developer")]
-        [Route("All")]
-        public async Task<ActionResult<IEnumerable<VoucherType>>> GetAllWithInactive()
+        [Route("SADGetAll")]
+        public async Task<ActionResult<IEnumerable<VoucherType_R>>> SuperAdminDeveloperGetAll()
         {
             try
             {
@@ -42,18 +92,17 @@ namespace iHotelManagement.Controllers
             }
         }
 
-        // GET: api/VoucherType/GetAll
+
+        // GET: api/Fiscal/SADGetAllActive
         [EnableQuery]
         [HttpGet]
         [Authorize(Roles = "SuperAdminDeveloper, Developer")]
-        [HttpGet]
-        [Route("GetAll")]
-        public async Task<ActionResult<IEnumerable<VoucherType>>> GetAll()
+        [Route("SADGetAllActive")]
+        public async Task<ActionResult<IEnumerable<VoucherType_R>>> SuperAdminDeveloperGetAllActive()
         {
             try
             {
-                var orgDetails = await _service.Get().ToListAsync();
-                return orgDetails;
+                return await _service.GetAll().Where(fy => fy.IsActive).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -61,19 +110,54 @@ namespace iHotelManagement.Controllers
             }
         }
 
-        // GET: api/VoucherType/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<VoucherType>> Get(int id)
+        // GET: api/Fiscal/GetAll
+        [EnableQuery]
+        [Authorize(Roles = "OrgSuperAdmin, Developer")]
+        [HttpGet]
+        [Route("OSAGetAll")]
+        public async Task<ActionResult<IEnumerable<VoucherType_R>>> OrganizationSuperAdminDeveloperGetAll()
         {
             try
             {
-                return await _service.GetAsync(id);
+                return await _service.GetAllOfOrg().ToListAsync();
             }
             catch (Exception ex)
             {
                 return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
             }
         }
+
+        // GET: api/Fiscal/OSAGetAll
+        [EnableQuery]
+        [Authorize(Roles = "OrgSuperAdmin, Developer")]
+        [HttpGet]
+        [Route("OSAGetAllActive")]
+        public async Task<ActionResult<IEnumerable<VoucherType_R>>> OrganizationSuperAdminDeveloperGetAllActive()
+        {
+            try
+            {
+                return await _service.GetAllOfOrg().Where(fy => fy.IsActive).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+            }
+        }
+
+        // GET: api/Fiscal/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<VoucherType_R>> Get(int id)
+        {
+            try
+            {
+                return await _service.GetById(id).SingleOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+            }
+        }
+
 
         // PUT: api/VoucherType/5
         [HttpPut("{id}")]
@@ -134,7 +218,7 @@ namespace iHotelManagement.Controllers
 
         private async Task<bool> isExists(int id)
         {
-            return await _service.GetAsync(id) != null;
+            return await _service.GetById(id).SingleOrDefaultAsync() != null;
         }
     }
 }

@@ -44,31 +44,13 @@ namespace iHotelManagement.Controllers
             }
         }
 
-        // GET: api/Organization
-        [EnableQuery]
-        [HttpGet]
-        [Authorize(Roles = "SuperAdminDeveloper, Developer")]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
-        {
-            try
-            {
-                var orgDetails = await orgService.Get().ToListAsync();
-                return orgDetails;
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
-            }
-        }
-
         // GET: api/Organization/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Organization>> GetOrganization(int id)
         {
             try
             {
-                return await orgService.GetAsync(id);
+                return await orgService.GetById(id).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -135,7 +117,7 @@ namespace iHotelManagement.Controllers
 
         private async Task<bool> OrganizationExists(int id)
         {
-            return await orgService.GetAsync(id) != null;
+            return await orgService.GetById(id).SingleOrDefaultAsync() != null;
         }
     }
 }

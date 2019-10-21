@@ -125,7 +125,7 @@ namespace iHotel.Repository.Extensions.DbExtension.Fluent
                 entity.Property(e => e.Organization)
                     .IsRequired();
 
-                entity.Property(e => e.ActivityBy)
+                entity.Property(e => e.User)
                     .HasMaxLength(150);
 
                 entity.Property(e => e.ActivityTable)

@@ -20,4 +20,15 @@ namespace iHotel.Entity.Accounting
         public virtual LedgerRef LedgerCodeNavigation { get; set; }
         public virtual VoucherMaster VoucherMasters { get; set; }
     }
+
+    public class VoucherDetail_R: VoucherDetail
+    {
+        public string OrgName { get; set; }
+        public string C_User { get; set; }
+        public string C_On_BS { get; set; }
+        public string C_On_AD { get; set; }
+        public string U_User { get; set; }
+        public string U_On_BS { get; set; }
+        public string U_On_AD { get; set; }
+    }
 }

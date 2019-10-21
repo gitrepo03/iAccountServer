@@ -26,12 +26,12 @@ namespace iHotelManagement.Controllers
         }
 
 
-        // GET: api/Fiscal/All
+        // GET: api/Fiscal/SADGetAll
         [EnableQuery]
         [HttpGet]
         [Authorize(Roles = "SuperAdminDeveloper, Developer")]
-        [Route("All")]
-        public async Task<ActionResult<IEnumerable<FiscalYear>>> GetAllWithInactive()
+        [Route("SADGetAll")]
+        public async Task<ActionResult<IEnumerable<FiscalYear_R>>> SuperAdminDeveloperGetAll()
         {
             try
             {
@@ -43,18 +43,51 @@ namespace iHotelManagement.Controllers
             }
         }
 
-        // GET: api/Fiscal/GetAll
+
+        //// GET: api/Fiscal/SADGetAllActive
         [EnableQuery]
         [HttpGet]
         [Authorize(Roles = "SuperAdminDeveloper, Developer")]
-        [HttpGet]
-        [Route("GetAll")]
-        public async Task<ActionResult<IEnumerable<FiscalYear>>> GetAll()
+        [Route("SADGetAllActive")]
+        public async Task<ActionResult<IEnumerable<FiscalYear_R>>> SuperAdminDeveloperGetAllActive()
         {
             try
             {
-                var orgDetails = await _service.Get().ToListAsync();
-                return orgDetails;
+                return await _service.GetAll().Where(fy => fy.IsActive).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+            }
+        }
+
+        // GET: api/Fiscal/GetAll
+        [EnableQuery]
+        [Authorize(Roles = "OrgSuperAdmin, Developer")]
+        [HttpGet]
+        [Route("OSAGetAll")]
+        public async Task<ActionResult<IEnumerable<FiscalYear>>> OrganizationSuperAdminDeveloperGetAll()
+        {
+            try
+            {
+                return await _service.GetAllOfOrg().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ExceptionHandler.AbstractExceptionMessage(ex));
+            }
+        }
+
+        // GET: api/Fiscal/OSAGetAll
+        [EnableQuery]
+        [Authorize(Roles = "OrgSuperAdmin, Developer")]
+        [HttpGet]
+        [Route("OSAGetAllActive")]
+        public async Task<ActionResult<IEnumerable<FiscalYear>>> OrganizationSuperAdminDeveloperGetAllActive()
+        {
+            try
+            {
+                return await _service.GetAllOfOrg().Where(fy => fy.IsActive).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -64,11 +97,12 @@ namespace iHotelManagement.Controllers
 
         // GET: api/Fiscal/5
         [HttpGet("{id}")]
+        //[Route("GetById")]
         public async Task<ActionResult<FiscalYear>> Get(int id)
         {
             try
             {
-                return await _service.GetAsync(id);
+                return await _service.GetById(id).SingleOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -135,7 +169,7 @@ namespace iHotelManagement.Controllers
 
         private async Task<bool> isExists(int id)
         {
-            return await _service.GetAsync(id) != null;
+            return await _service.GetById(id).SingleOrDefaultAsync() != null;
         }
     }
 }
